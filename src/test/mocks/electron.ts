@@ -10,6 +10,12 @@ import type { ElectronAPI } from '@shared/types/electron.d';
  */
 export const mockElectronAPI: ElectronAPI = {
   platform: 'win32',
+  versions: {
+    node: '20.0.0',
+    chrome: '120.0.0',
+    electron: '40.1.0',
+  },
+  isPackaged: false,
 };
 
 /**
@@ -19,6 +25,12 @@ export const mockElectronAPI: ElectronAPI = {
 export function setupElectronMock(platform: string = 'win32'): void {
   const mockAPI: ElectronAPI = {
     platform,
+    versions: {
+      node: '20.0.0',
+      chrome: '120.0.0',
+      electron: '40.1.0',
+    },
+    isPackaged: false,
   };
   
   Object.defineProperty(window, 'electronAPI', {

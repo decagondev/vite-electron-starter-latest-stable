@@ -1,9 +1,10 @@
 /**
  * Electron main process
  * Manages application lifecycle and window creation
+ * Implements security best practices for Electron 40+
  */
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, session } from 'electron'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { existsSync } from 'fs'
@@ -11,16 +12,27 @@ import { existsSync } from 'fs'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-// Detect development mode
+/**
+ * Environment configuration
+ */
 const isDev = process.env.NODE_ENV === 'development' || !app.isPackaged
-// IMPORTANT: If your Vite dev server uses a different port, change 5173
-// You can check your vite.config.ts or run 'npm run dev' to see the port
 const WEB_PORT = process.env.VITE_PORT || 5173
+
+/**
+ * Content Security Policy for production
+ * Restricts what resources can be loaded
+ */
+const CONTENT_SECURITY_POLICY = isDev
+  ? "default-src 'self' 'unsafe-inline' 'unsafe-eval'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' ws://localhost:* http://localhost:*;"
+  : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self';"
 
 let mainWindow: BrowserWindow | null = null
 
+/**
+ * Create the main application window
+ * Configured with security best practices
+ */
 function createWindow(): void {
-  // Create the browser window
   mainWindow = new BrowserWindow({
     width: 1400,
     height: 900,
@@ -28,12 +40,14 @@ function createWindow(): void {
     minHeight: 600,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
-      nodeIntegration: false,        // Security: don't expose Node.js
-      contextIsolation: true,        // Security: isolate context
-      sandbox: false,                // May be needed for some libraries
+      nodeIntegration: false,
+      contextIsolation: true,
+      sandbox: true,
+      webSecurity: true,
+      allowRunningInsecureContent: false,
     },
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
-    show: false, // Don't show until ready
+    show: false,
   })
 
   // Show window when ready
@@ -79,12 +93,28 @@ function createWindow(): void {
   })
 }
 
-// This method will be called when Electron has finished initialization
+/**
+ * Configure security headers for all requests
+ */
+function setupSecurityHeaders(): void {
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [CONTENT_SECURITY_POLICY],
+      },
+    })
+  })
+}
+
+/**
+ * Application initialization
+ */
 app.whenReady().then(() => {
+  setupSecurityHeaders()
   createWindow()
 
   app.on('activate', () => {
-    // On macOS, re-create window when dock icon is clicked
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow()
     }
@@ -98,14 +128,26 @@ app.on('window-all-closed', () => {
   }
 })
 
-// Security: Prevent new window creation
+/**
+ * Security: Prevent new window creation and restrict navigation
+ */
 app.on('web-contents-created', (_event, contents) => {
   contents.setWindowOpenHandler(() => {
-    // Prevent new window creation
-    // Optionally open in external browser:
-    // const { shell } = require('electron')
-    // shell.openExternal(url)
     return { action: 'deny' }
+  })
+
+  contents.on('will-navigate', (event, navigationUrl) => {
+    const parsedUrl = new URL(navigationUrl)
+    
+    if (isDev && parsedUrl.origin === `http://localhost:${WEB_PORT}`) {
+      return
+    }
+    
+    if (!isDev && parsedUrl.protocol === 'file:') {
+      return
+    }
+    
+    event.preventDefault()
   })
 })
 
