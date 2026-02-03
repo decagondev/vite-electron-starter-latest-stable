@@ -1,7 +1,9 @@
-import { useBreathingTimer } from './hooks/useBreathingTimer';
-import { BreathingCircle } from './components/BreathingCircle';
-import { ControlPanel } from './components/ControlPanel';
-import { ProgressInfo } from './components/ProgressInfo';
+import {
+  useBreathingTimer,
+  BreathingCircle,
+  ControlPanel,
+  ProgressInfo,
+} from '@features/breathing';
 
 export function App() {
   const { state, toggleSession, setSessionDuration } = useBreathingTimer();

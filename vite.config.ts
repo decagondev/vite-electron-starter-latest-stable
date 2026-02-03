@@ -1,3 +1,4 @@
+import { resolve } from 'path'
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -14,6 +15,13 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react(), tailwindcss()],
     base: isDesktop ? './' : '/',
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src'),
+        '@features': resolve(__dirname, 'src/features'),
+        '@shared': resolve(__dirname, 'src/shared'),
+      },
+    },
     build: {
       target: 'esnext',
       minify: isProduction ? 'esbuild' : false,
