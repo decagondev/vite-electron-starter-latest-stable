@@ -1,6 +1,6 @@
 {
-  "name": "system-dashboard",
-  "description": "Real-time system monitoring dashboard with memory and network statistics",
+  "name": "deca-dash",
+  "description": "Deca Dash - Real-time system monitoring dashboard with memory and network statistics",
   "private": true,
   "version": "2.0.0",
   "type": "module",
@@ -55,8 +55,8 @@
     "wait-on": "^9.0.3"
   },
   "build": {
-    "appId": "com.systemdashboard.electron",
-    "productName": "System Dashboard",
+    "appId": "com.decadash.electron",
+    "productName": "Deca Dash",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "directories": {
       "output": "release",

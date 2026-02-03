@@ -5,7 +5,7 @@
  * Provides IPC handlers for system stats (dashboard feature)
  */
 
-import { app, BrowserWindow, session, ipcMain } from 'electron'
+import { app, BrowserWindow, session, ipcMain, Menu } from 'electron'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { existsSync } from 'fs'
@@ -40,6 +40,8 @@ function createWindow(): void {
     height: 900,
     minWidth: 800,
     minHeight: 600,
+    title: 'Deca Dash',
+    autoHideMenuBar: true,
     webPreferences: {
       preload: join(__dirname, 'preload.js'),
       nodeIntegration: false,
@@ -51,6 +53,11 @@ function createWindow(): void {
     titleBarStyle: process.platform === 'darwin' ? 'hiddenInset' : 'default',
     show: false,
   })
+
+  // Remove menu bar entirely on Windows/Linux
+  if (process.platform !== 'darwin') {
+    Menu.setApplicationMenu(null)
+  }
 
   // Show window when ready
   mainWindow.once('ready-to-show', () => {

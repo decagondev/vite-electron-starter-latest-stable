@@ -53,7 +53,7 @@ function DashboardHeader(): React.ReactElement {
       <div>
         <h1 className="text-2xl font-bold text-slate-100 flex items-center gap-3">
           <DashboardIcon />
-          System Dashboard
+          Deca Dash
         </h1>
         {systemInfo && (
           <p className="text-sm text-slate-400 mt-1">
