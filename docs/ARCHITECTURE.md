@@ -1,39 +1,100 @@
 # Architecture Documentation
 
-This document describes the architectural decisions and patterns used in this Vite-React-TypeScript-Electron template.
+This document describes the architectural decisions and patterns used in Deca Dash.
 
 ## Overview
 
-The project follows a feature-based modular architecture with SOLID principles, enabling easy extension and maintenance.
+Deca Dash follows a feature-based modular architecture with SOLID principles, enabling easy extension and maintenance. The application is built on the Electron framework, providing both a web preview and a full-featured desktop application with system-level access.
+
+## System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              ELECTRON APP                                │
+│                                                                          │
+│  ┌────────────────────────────────────────────────────────────────────┐ │
+│  │                        MAIN PROCESS                                 │ │
+│  │                                                                     │ │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────────────┐  │ │
+│  │  │   Window     │  │   Security   │  │     IPC Handlers        │  │ │
+│  │  │  Management  │  │   (CSP,      │  │  ┌─────────────────┐    │  │ │
+│  │  │              │  │   sandbox)   │  │  │ get-memory-stats│    │  │ │
+│  │  └──────────────┘  └──────────────┘  │  │ get-network-stats    │  │ │
+│  │                                       │  │ get-top-processes    │  │ │
+│  │                                       │  │ get-system-info │    │  │ │
+│  │                                       │  │ toggle-kiosk-mode    │  │ │
+│  │                                       │  └─────────────────┘    │  │ │
+│  │                                       └─────────────────────────┘  │ │
+│  │                                              │                      │ │
+│  │                                              │ systeminformation    │ │
+│  │                                              ▼                      │ │
+│  │                                       ┌──────────────┐             │ │
+│  │                                       │   OS APIs    │             │ │
+│  │                                       │ (CPU, Memory,│             │ │
+│  │                                       │  Network)    │             │ │
+│  │                                       └──────────────┘             │ │
+│  └────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                     │
+│                                    │ contextBridge (IPC)                 │
+│                                    ▼                                     │
+│  ┌────────────────────────────────────────────────────────────────────┐ │
+│  │                       PRELOAD SCRIPT                                │ │
+│  │           (Secure API exposure via contextBridge)                   │ │
+│  └────────────────────────────────────────────────────────────────────┘ │
+│                                    │                                     │
+│                                    │ window.electronAPI                  │
+│                                    ▼                                     │
+│  ┌────────────────────────────────────────────────────────────────────┐ │
+│  │                       RENDERER PROCESS                              │ │
+│  │                                                                     │ │
+│  │  ┌──────────────────────────────────────────────────────────────┐  │ │
+│  │  │                    REACT APPLICATION                          │  │ │
+│  │  │                                                               │  │ │
+│  │  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────────┐   │  │ │
+│  │  │  │  Providers  │    │   Hooks     │    │   Components    │   │  │ │
+│  │  │  │ (Contexts)  │───▶│(Data Fetch) │───▶│  (UI Display)   │   │  │ │
+│  │  │  └─────────────┘    └─────────────┘    └─────────────────┘   │  │ │
+│  │  │                                                               │  │ │
+│  │  │  ┌─────────────────────────────────────────────────────────┐ │  │ │
+│  │  │  │                    Dashboard Feature                     │ │  │ │
+│  │  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │ │  │ │
+│  │  │  │  │MemorySection│  │NetworkSection│ │ProcessesSection │  │ │  │ │
+│  │  │  │  └─────────────┘  └─────────────┘  └─────────────────┘  │ │  │ │
+│  │  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │ │  │ │
+│  │  │  │  │  LineGraph  │  │  PieChart   │  │    StatCard     │  │ │  │ │
+│  │  │  │  └─────────────┘  └─────────────┘  └─────────────────┘  │ │  │ │
+│  │  │  └─────────────────────────────────────────────────────────┘ │  │ │
+│  │  └──────────────────────────────────────────────────────────────┘  │ │
+│  └────────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────────┘
+```
 
 ## Project Structure
 
 ```
 ├── electron/                 # Electron main process
-│   ├── main.ts              # Application entry point
+│   ├── main.ts              # Application entry, IPC handlers, security
 │   └── preload.ts           # Secure bridge to renderer
 ├── src/
 │   ├── features/            # Feature modules
-│   │   └── breathing/       # Breathing exercise feature
-│   │       ├── components/  # React components
-│   │       ├── hooks/       # Custom hooks
-│   │       ├── context/     # React context providers
-│   │       ├── constants/   # Configuration constants
-│   │       ├── types/       # TypeScript types
+│   │   └── dashboard/       # System monitoring dashboard
+│   │       ├── components/  # React components (sections, charts, cards)
+│   │       ├── hooks/       # Data fetching (useSystemStats)
+│   │       ├── context/     # State management (StatsContext)
+│   │       ├── types/       # TypeScript interfaces
 │   │       └── index.ts     # Barrel export
 │   ├── shared/              # Shared utilities
-│   │   ├── components/      # Shared React components
-│   │   ├── context/         # Shared context providers
+│   │   ├── context/         # App-wide contexts (ElectronContext)
 │   │   ├── lib/             # Utility functions
-│   │   ├── types/           # Shared type definitions
+│   │   ├── types/           # Shared types (ElectronAPI)
 │   │   └── index.ts         # Barrel export
 │   ├── test/                # Test utilities
 │   │   ├── mocks/           # Mock implementations
 │   │   └── setup.ts         # Test configuration
 │   ├── App.tsx              # Root component
 │   └── main.tsx             # React entry point
-├── .github/workflows/       # CI/CD configuration
-└── docs/                    # Documentation
+├── docs/                    # Documentation
+└── .github/workflows/       # CI/CD configuration
 ```
 
 ## SOLID Principles
@@ -42,115 +103,222 @@ The project follows a feature-based modular architecture with SOLID principles, 
 
 Each module has a single, well-defined purpose:
 
-- **Components**: Only handle rendering and user interaction
-- **Hooks**: Only manage state and side effects
-- **Context**: Only provide dependency injection
-- **Constants**: Only define configuration values
+| Module | Responsibility |
+|--------|---------------|
+| `MemorySection` | Display memory statistics only |
+| `NetworkSection` | Display network statistics only |
+| `ProcessesSection` | Display process list only |
+| `useSystemStats` | Fetch and manage system stats |
+| `StatsContext` | Provide stats to component tree |
+| `LineGraph` | Render line chart visualization |
+| `PieChart` | Render pie chart visualization |
+| `StatCard` | Render single metric card |
 
 ### Open/Closed Principle (OCP)
 
-The breathing feature is extensible without modification:
+Components are configurable without modification:
 
 ```typescript
-// Custom breathing pattern without modifying core code
-const customPattern: IBreathingPatternConfig = {
-  name: 'Custom 3-3-3',
-  phases: [
-    { name: 'inhale', duration: 3, instruction: 'Breathe In' },
-    { name: 'hold', duration: 3, instruction: 'Hold' },
-    { name: 'exhale', duration: 3, instruction: 'Breathe Out' },
-  ],
-};
+// LineGraph is open for extension via props
+<LineGraph
+  data={history}
+  lines={[
+    { dataKey: 'cpu', name: 'CPU', color: '#3b82f6' },
+    { dataKey: 'memory', name: 'Memory', color: '#22c55e' },
+  ]}
+  dataAccessor={(point, key) => point[key]}
+  height={200}
+/>
 
-// Use with the hook
-useBreathingTimer({ pattern: customPattern });
+// Add new metrics without modifying LineGraph component
 ```
 
 ### Liskov Substitution (LSP)
 
-All breathing patterns implement the same interface and can be substituted:
+All chart data follows the same interface pattern:
 
 ```typescript
-interface IBreathingPatternConfig {
+// Any component providing IPieSegment[] works with PieChart
+interface IPieSegment {
   name: string;
-  phases: IBreathingPhaseConfig[];
+  value: number;
+  color: string;
 }
+
+// Memory allocation, disk usage, process distribution - all use same interface
 ```
 
 ### Interface Segregation (ISP)
 
 Interfaces are small and focused:
 
-- `ITimerState` - Timer state values only
-- `ITimerControls` - Timer control actions only
-- `IBreathingPhaseConfig` - Phase configuration only
+```typescript
+interface IMemoryStats {
+  total: number;
+  used: number;
+  free: number;
+  usedPercent: number;
+}
+
+interface INetworkStats {
+  rxBytes: number;
+  txBytes: number;
+  rxSec: number;
+  txSec: number;
+}
+
+// Each interface has only what's needed for its purpose
+```
 
 ### Dependency Inversion (DIP)
 
 Components depend on abstractions (Context) not implementations:
 
 ```typescript
-// Component depends on context, not direct hook
-function App() {
-  const { state } = useBreathing(); // From context
+// Component depends on context abstraction
+function MemorySection() {
+  const { memory, isLoading } = useStats();  // From context
+  return <MemoryDisplay data={memory} />;
 }
+
+// Not directly on:
+// window.electronAPI.getMemoryStats() // Direct dependency - avoid
 ```
 
 ## Data Flow
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         App                                  │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │              ElectronProvider (optional)               │  │
-│  │  ┌─────────────────────────────────────────────────┐  │  │
-│  │  │                BreathingProvider                 │  │  │
-│  │  │  ┌─────────────────────────────────────────────┐│  │  │
-│  │  │  │              useBreathingTimer              ││  │  │
-│  │  │  │  ┌─────────┐  ┌───────────┐  ┌──────────┐  ││  │  │
-│  │  │  │  │ State   │  │ Controls  │  │ Config   │  ││  │  │
-│  │  │  │  └────┬────┘  └─────┬─────┘  └────┬─────┘  ││  │  │
-│  │  │  └───────┼─────────────┼─────────────┼────────┘│  │  │
-│  │  │          │             │             │          │  │  │
-│  │  │  ┌───────┼─────────────┼─────────────┼────────┐│  │  │
-│  │  │  │       ▼             ▼             ▼        ││  │  │
-│  │  │  │  BreathingCircle  ControlPanel  ProgressInfo│  │  │
-│  │  │  └────────────────────────────────────────────┘│  │  │
-│  │  └─────────────────────────────────────────────────┘  │  │
-│  └───────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                              App.tsx                                     │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │                        ElectronProvider                            │  │
+│  │  ┌─────────────────────────────────────────────────────────────┐  │  │
+│  │  │                       StatsProvider                          │  │  │
+│  │  │                                                              │  │  │
+│  │  │  ┌────────────────────────────────────────────────────────┐ │  │  │
+│  │  │  │                   useSystemStats                        │ │  │  │
+│  │  │  │                                                         │ │  │  │
+│  │  │  │   ┌──────────┐   ┌──────────┐   ┌──────────────────┐   │ │  │  │
+│  │  │  │   │  State   │   │ Actions  │   │ Polling Logic    │   │ │  │  │
+│  │  │  │   │ (memory, │   │(refresh, │   │ (interval-based  │   │ │  │  │
+│  │  │  │   │ network, │   │ clear)   │   │  IPC calls)      │   │ │  │  │
+│  │  │  │   │processes)│   └────┬─────┘   └─────────┬────────┘   │ │  │  │
+│  │  │  │   └────┬─────┘        │                   │            │ │  │  │
+│  │  │  └────────┼──────────────┼───────────────────┼────────────┘ │  │  │
+│  │  │           │              │                   │              │  │  │
+│  │  │           ▼              ▼                   ▼              │  │  │
+│  │  │  ┌────────────────────────────────────────────────────────┐ │  │  │
+│  │  │  │                  DashboardLayout                        │ │  │  │
+│  │  │  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────┐   │ │  │  │
+│  │  │  │  │MemorySection│ │NetworkSection│ │ProcessesSection │   │ │  │  │
+│  │  │  │  │  ┌───────┐  │ │  ┌───────┐  │ │  ┌───────────┐  │   │ │  │  │
+│  │  │  │  │  │Charts │  │ │  │Charts │  │ │  │ProcessTable│  │   │ │  │  │
+│  │  │  │  │  │Cards  │  │ │  │Cards  │  │ │  └───────────┘  │   │ │  │  │
+│  │  │  │  │  └───────┘  │ │  └───────┘  │ │                 │   │ │  │  │
+│  │  │  │  └─────────────┘ └─────────────┘ └─────────────────┘   │ │  │  │
+│  │  │  └────────────────────────────────────────────────────────┘ │  │  │
+│  │  └─────────────────────────────────────────────────────────────┘  │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
+
+## IPC Communication
+
+The main process and renderer communicate via IPC (Inter-Process Communication):
+
+```
+Renderer                    Main Process
+   │                             │
+   │  ipcRenderer.invoke()       │
+   │ ────────────────────────▶   │
+   │   'get-memory-stats'        │
+   │                             │  systeminformation.mem()
+   │                             │ ──────────────────────▶ OS
+   │                             │ ◀──────────────────────
+   │   Promise<IMemoryStats>     │
+   │ ◀────────────────────────   │
+   │                             │
+```
+
+### Security Model
+
+1. **Context Isolation**: Renderer is isolated from Node.js
+2. **Preload Script**: Only exposes specific, validated APIs
+3. **No Node Integration**: `nodeIntegration: false`
+4. **CSP Headers**: Restricts resource loading
+5. **Navigation Restriction**: Only trusted origins allowed
 
 ## Electron Security
 
-The template implements Electron security best practices:
+### Configuration
 
-1. **Context Isolation**: Renderer process is isolated from Node.js
-2. **Sandbox Mode**: Renderer runs in sandboxed environment
-3. **CSP Headers**: Content Security Policy restricts resource loading
-4. **Navigation Restriction**: Only trusted origins allowed
-5. **Preload Script**: Secure bridge using contextBridge API
+```typescript
+// electron/main.ts
+webPreferences: {
+  preload: join(__dirname, 'preload.js'),
+  nodeIntegration: false,      // No Node.js in renderer
+  contextIsolation: true,      // Separate contexts
+  sandbox: false,              // For IPC access
+  webSecurity: true,           // Enable web security
+  allowRunningInsecureContent: false,
+}
+```
+
+### Content Security Policy
+
+```typescript
+// Development
+"default-src 'self' 'unsafe-inline' 'unsafe-eval'; ..."
+
+// Production
+"default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; ..."
+```
 
 ## Testing Strategy
 
-- **Unit Tests**: Timer logic, constants, utilities
-- **Component Tests**: React components with Testing Library
-- **Integration Tests**: Full feature flows
-- **Mocks**: Electron API mocks for testing without runtime
+### Test Categories
+
+| Category | Location | Purpose |
+|----------|----------|---------|
+| Unit Tests | `__tests__/*.test.ts` | Test hooks, utilities |
+| Component Tests | `__tests__/*.test.tsx` | Test React components |
+| Integration Tests | `__tests__/*.test.tsx` | Test feature flows |
+| Mock Utilities | `src/test/mocks/` | Electron API mocks |
+
+### Testing Without Electron
+
+```typescript
+// Setup Electron mock
+import { setupElectronMock, clearElectronMock } from '@/test/mocks/electron';
+
+beforeEach(() => {
+  setupElectronMock();  // Simulates Electron environment
+});
+
+afterEach(() => {
+  clearElectronMock();  // Cleanup
+});
+```
 
 ## Path Aliases
 
 ```typescript
-// Available aliases
-import { useBreathing } from '@features/breathing';
-import { isElectron } from '@shared/index';
+// Available aliases (configured in tsconfig.app.json)
+import { DashboardLayout, useStats } from '@features/dashboard';
+import { isElectron, ElectronProvider } from '@shared/index';
 import { mockElectronAPI } from '@/test/mocks/electron';
 ```
 
 ## Adding New Features
 
-1. Create feature directory: `src/features/my-feature/`
-2. Add components, hooks, types, and context
-3. Create barrel export: `index.ts`
-4. Register with providers in `main.tsx`
-5. Add tests in `__tests__/` directories
+1. **Create feature directory**: `src/features/my-feature/`
+2. **Add components**: `components/MyComponent.tsx`
+3. **Add hooks**: `hooks/useMyData.ts`
+4. **Add types**: `types/my-feature.types.ts`
+5. **Add context** (if needed): `context/MyContext.tsx`
+6. **Create barrel export**: `index.ts`
+7. **Add IPC handlers** (if needed): `electron/main.ts`
+8. **Update preload**: `electron/preload.ts`
+9. **Add tests**: `__tests__/` directories
+
+See [EXTENSION-GUIDE.md](EXTENSION-GUIDE.md) for detailed instructions.
