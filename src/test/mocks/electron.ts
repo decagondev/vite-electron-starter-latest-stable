@@ -3,7 +3,6 @@
  * Allows testing Electron-dependent code without Electron runtime
  */
 
-import { vi } from 'vitest';
 import type { ElectronAPI } from '@shared/types/electron.d';
 
 /**
