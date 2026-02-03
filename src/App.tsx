@@ -1,5 +1,5 @@
 import {
-  useBreathingTimer,
+  useBreathing,
   BreathingCircle,
   ControlPanel,
   ProgressInfo,
@@ -8,6 +8,7 @@ import {
 /**
  * Main application component
  * Demonstrates the breathing exercise with SOLID-compliant architecture
+ * Uses context for state management (Dependency Inversion)
  */
 export function App() {
   const { 
@@ -15,7 +16,7 @@ export function App() {
     toggleSession, 
     setSessionDuration,
     currentPhaseConfig,
-  } = useBreathingTimer();
+  } = useBreathing();
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
