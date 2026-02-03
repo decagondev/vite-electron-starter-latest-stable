@@ -68,6 +68,8 @@ interface ElectronAPI {
   getNetworkStats: () => Promise<INetworkStats | null>;
   getSystemInfo: () => Promise<ISystemInfo | null>;
   getTopProcesses: (count?: number) => Promise<IProcessInfo[] | null>;
+  toggleKioskMode: () => Promise<boolean>;
+  getKioskMode: () => Promise<boolean>;
 }
 
 /**
@@ -85,6 +87,8 @@ const electronAPI: ElectronAPI = {
   getNetworkStats: () => ipcRenderer.invoke('get-network-stats'),
   getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
   getTopProcesses: (count?: number) => ipcRenderer.invoke('get-top-processes', count),
+  toggleKioskMode: () => ipcRenderer.invoke('toggle-kiosk-mode'),
+  getKioskMode: () => ipcRenderer.invoke('get-kiosk-mode'),
 }
 
 /**

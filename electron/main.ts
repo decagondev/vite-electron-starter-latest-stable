@@ -228,6 +228,25 @@ ipcMain.handle('get-top-processes', async (_event, count: number = 10) => {
 })
 
 /**
+ * Toggle fullscreen/kiosk mode
+ */
+ipcMain.handle('toggle-kiosk-mode', async () => {
+  if (!mainWindow) return false
+  
+  const isFullScreen = mainWindow.isFullScreen()
+  mainWindow.setFullScreen(!isFullScreen)
+  return !isFullScreen
+})
+
+/**
+ * Get current kiosk mode state
+ */
+ipcMain.handle('get-kiosk-mode', async () => {
+  if (!mainWindow) return false
+  return mainWindow.isFullScreen()
+})
+
+/**
  * Application initialization
  */
 app.whenReady().then(() => {

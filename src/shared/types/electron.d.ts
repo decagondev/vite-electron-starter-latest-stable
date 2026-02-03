@@ -84,6 +84,10 @@ export interface ElectronAPI {
   getSystemInfo: () => Promise<ISystemInfo | null>;
   /** Get top processes by resource usage */
   getTopProcesses: (count?: number) => Promise<IProcessInfo[] | null>;
+  /** Toggle kiosk/fullscreen mode */
+  toggleKioskMode: () => Promise<boolean>;
+  /** Get current kiosk mode state */
+  getKioskMode: () => Promise<boolean>;
 }
 
 declare global {

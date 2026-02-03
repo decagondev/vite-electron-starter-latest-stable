@@ -62,6 +62,8 @@ export const mockElectronAPI: ElectronAPI = {
   getNetworkStats: async () => mockNetworkStats,
   getSystemInfo: async () => mockSystemInfo,
   getTopProcesses: async () => mockProcesses,
+  toggleKioskMode: async () => false,
+  getKioskMode: async () => false,
 };
 
 /**
@@ -84,6 +86,8 @@ export function setupElectronMock(platform: string = 'win32', statsEnabled: bool
     getNetworkStats: statsEnabled ? async () => mockNetworkStats : async () => null,
     getSystemInfo: statsEnabled ? async () => mockSystemInfo : async () => null,
     getTopProcesses: statsEnabled ? async () => mockProcesses : async () => null,
+    toggleKioskMode: async () => false,
+    getKioskMode: async () => false,
   };
   
   Object.defineProperty(window, 'electronAPI', {

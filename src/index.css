@@ -3,3 +3,13 @@
 body {
   @apply bg-slate-900 text-white min-h-screen;
 }
+
+/* Hide scrollbar while maintaining scroll functionality */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}

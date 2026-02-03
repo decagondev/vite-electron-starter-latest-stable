@@ -4,7 +4,7 @@
  * Follows Single Responsibility - focused on layout orchestration
  */
 
-import { memo } from 'react'
+import { memo, useState, useEffect, useCallback } from 'react'
 import { useStats } from '../context/StatsContext'
 import { MemorySection } from './MemorySection'
 import { NetworkSection } from './NetworkSection'
@@ -43,11 +43,67 @@ function RefreshIcon(): React.ReactElement {
 }
 
 /**
+ * Fullscreen icon SVG component (expand)
+ */
+function FullscreenIcon(): React.ReactElement {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth={2} 
+        d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" 
+      />
+    </svg>
+  )
+}
+
+/**
+ * Exit fullscreen icon SVG component (collapse)
+ */
+function ExitFullscreenIcon(): React.ReactElement {
+  return (
+    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path 
+        strokeLinecap="round" 
+        strokeLinejoin="round" 
+        strokeWidth={2} 
+        d="M9 9V4H4m0 0l5 5M9 15v5H4m0 0l5-5m6-6V4h5m0 0l-5 5m5 6v5h-5m0 0l5-5" 
+      />
+    </svg>
+  )
+}
+
+/**
+ * Check if kiosk mode API is available
+ */
+function isKioskAvailable(): boolean {
+  return typeof window !== 'undefined' && 
+         window.electronAPI !== undefined &&
+         typeof window.electronAPI.toggleKioskMode === 'function'
+}
+
+/**
  * DashboardHeader component
- * Shows title and refresh button
+ * Shows title, refresh button, and kiosk mode toggle
  */
 function DashboardHeader(): React.ReactElement {
   const { refreshStats, isLoading, systemInfo } = useStats()
+  const [isKiosk, setIsKiosk] = useState(false)
+  const [kioskAvailable] = useState(() => isKioskAvailable())
+
+  useEffect(() => {
+    if (kioskAvailable && window.electronAPI) {
+      window.electronAPI.getKioskMode().then(setIsKiosk)
+    }
+  }, [kioskAvailable])
+
+  const toggleKiosk = useCallback(async () => {
+    if (kioskAvailable && window.electronAPI) {
+      const newState = await window.electronAPI.toggleKioskMode()
+      setIsKiosk(newState)
+    }
+  }, [kioskAvailable])
 
   return (
     <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
@@ -62,22 +118,39 @@ function DashboardHeader(): React.ReactElement {
           </p>
         )}
       </div>
-      <button
-        onClick={refreshStats}
-        disabled={isLoading}
-        className="
-          flex items-center gap-2 px-4 py-2
-          bg-slate-700 hover:bg-slate-600 
-          disabled:opacity-50 disabled:cursor-not-allowed
-          text-slate-200 rounded-lg transition-colors
-          text-sm font-medium
-        "
-      >
-        <span className={isLoading ? 'animate-spin' : ''}>
-          <RefreshIcon />
-        </span>
-        Refresh
-      </button>
+      <div className="flex items-center gap-2">
+        {kioskAvailable && (
+          <button
+            onClick={toggleKiosk}
+            className="
+              flex items-center gap-2 px-4 py-2
+              bg-slate-700 hover:bg-slate-600 
+              text-slate-200 rounded-lg transition-colors
+              text-sm font-medium
+            "
+            title={isKiosk ? 'Exit Kiosk Mode (Esc)' : 'Enter Kiosk Mode'}
+          >
+            {isKiosk ? <ExitFullscreenIcon /> : <FullscreenIcon />}
+            <span className="hidden sm:inline">{isKiosk ? 'Exit Kiosk' : 'Kiosk'}</span>
+          </button>
+        )}
+        <button
+          onClick={refreshStats}
+          disabled={isLoading}
+          className="
+            flex items-center gap-2 px-4 py-2
+            bg-slate-700 hover:bg-slate-600 
+            disabled:opacity-50 disabled:cursor-not-allowed
+            text-slate-200 rounded-lg transition-colors
+            text-sm font-medium
+          "
+        >
+          <span className={isLoading ? 'animate-spin' : ''}>
+            <RefreshIcon />
+          </span>
+          <span className="hidden sm:inline">Refresh</span>
+        </button>
+      </div>
     </header>
   )
 }
