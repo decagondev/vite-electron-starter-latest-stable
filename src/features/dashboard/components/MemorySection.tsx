@@ -140,7 +140,7 @@ function MemorySectionComponent(): React.ReactElement {
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h3 className="text-sm font-medium text-slate-400 mb-2">Allocation</h3>
-              <PieChart data={pieData} height={180} />
+              <PieChart data={pieData} height={200} innerRadius={50} outerRadius={70} />
             </div>
             <div>
               <h3 className="text-sm font-medium text-slate-400 mb-2">Usage Over Time</h3>
