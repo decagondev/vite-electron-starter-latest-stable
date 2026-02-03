@@ -72,27 +72,27 @@ function StatCardComponent({
   return (
     <div 
       className={`
-        bg-slate-800/50 rounded-lg p-4 
+        bg-slate-800/50 rounded-lg p-3 sm:p-4 
         border border-slate-700/50
         hover:border-slate-600/50 transition-colors
         ${className}
       `}
     >
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm text-slate-400 font-medium">{label}</span>
+      <div className="flex items-center justify-between mb-1 sm:mb-2">
+        <span className="text-xs sm:text-sm text-slate-400 font-medium truncate">{label}</span>
         {icon && (
-          <span className="text-slate-400">{icon}</span>
+          <span className="text-slate-400 flex-shrink-0 ml-1">{icon}</span>
         )}
       </div>
-      <div className="flex items-end gap-2">
-        <span className="text-2xl font-bold text-slate-100">
+      <div className="flex items-end gap-1 sm:gap-2">
+        <span className="text-lg sm:text-2xl font-bold text-slate-100 truncate">
           {value}
         </span>
         {unit && (
-          <span className="text-sm text-slate-400 pb-1">{unit}</span>
+          <span className="text-xs sm:text-sm text-slate-400 pb-0.5 sm:pb-1 flex-shrink-0">{unit}</span>
         )}
         {trend && (
-          <span className="ml-auto pb-1">{TrendIcons[trend]}</span>
+          <span className="ml-auto pb-0.5 sm:pb-1 flex-shrink-0">{TrendIcons[trend]}</span>
         )}
       </div>
     </div>

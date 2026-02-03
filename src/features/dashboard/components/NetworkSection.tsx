@@ -116,8 +116,8 @@ function NetworkSectionComponent(): React.ReactElement {
 
   if (!isAvailable) {
     return (
-      <div className="bg-slate-800/30 rounded-lg p-6 border border-slate-700/50">
-        <h2 className="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+      <div className="bg-slate-800/30 rounded-lg p-4 sm:p-6 border border-slate-700/50">
+        <h2 className="text-base sm:text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
           <NetworkIcon /> Network
         </h2>
         <p className="text-slate-400 text-sm">
@@ -129,8 +129,8 @@ function NetworkSectionComponent(): React.ReactElement {
 
   if (error) {
     return (
-      <div className="bg-slate-800/30 rounded-lg p-6 border border-red-700/50">
-        <h2 className="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+      <div className="bg-slate-800/30 rounded-lg p-4 sm:p-6 border border-red-700/50">
+        <h2 className="text-base sm:text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
           <NetworkIcon /> Network
         </h2>
         <p className="text-red-400 text-sm">Error: {error}</p>
@@ -139,8 +139,8 @@ function NetworkSectionComponent(): React.ReactElement {
   }
 
   return (
-    <div className="bg-slate-800/30 rounded-lg p-6 border border-slate-700/50">
-      <h2 className="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+    <div className="bg-slate-800/30 rounded-lg p-4 sm:p-6 border border-slate-700/50 h-full">
+      <h2 className="text-base sm:text-lg font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
         <NetworkIcon /> Network
       </h2>
 
@@ -150,37 +150,37 @@ function NetworkSectionComponent(): React.ReactElement {
           <div className="h-48 bg-slate-700/50 rounded"></div>
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="space-y-4 sm:space-y-5">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <StatCard
-              label="Download Speed"
+              label="Download"
               value={network ? formatSpeed(network.rxSec) : '-'}
               icon={<DownloadIcon />}
             />
             <StatCard
-              label="Upload Speed"
+              label="Upload"
               value={network ? formatSpeed(network.txSec) : '-'}
               icon={<UploadIcon />}
             />
             <StatCard
-              label="Total Downloaded"
+              label="Total Down"
               value={network ? formatBytes(network.rxBytes) : '-'}
             />
             <StatCard
-              label="Total Uploaded"
+              label="Total Up"
               value={network ? formatBytes(network.txBytes) : '-'}
             />
           </div>
 
           <div>
-            <h3 className="text-sm font-medium text-slate-400 mb-2">Network Activity (MB/s)</h3>
+            <h3 className="text-xs sm:text-sm font-medium text-slate-400 mb-2">Network Activity (MB/s)</h3>
             <LineGraph
               data={history}
               lines={networkLineConfig}
               dataAccessor={networkDataAccessor}
               yAxisLabel="MB/s"
               yAxisFormatter={mbpsFormatter}
-              height={200}
+              height={180}
             />
           </div>
         </div>

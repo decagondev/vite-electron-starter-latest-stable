@@ -96,16 +96,16 @@ function DashboardHeader(): React.ReactElement {
  */
 function DashboardLayoutComponent(): React.ReactElement {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6">
       <div className="max-w-7xl mx-auto">
         <DashboardHeader />
         
-        <main className="grid gap-6 lg:grid-cols-1">
+        <main className="grid gap-4 sm:gap-6 grid-cols-1 xl:grid-cols-2">
           <MemorySection />
           <NetworkSection />
         </main>
 
-        <footer className="mt-8 text-center text-sm text-slate-500">
+        <footer className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-slate-500">
           <p>Real-time system monitoring · Polling every 2 seconds</p>
         </footer>
       </div>

@@ -75,8 +75,8 @@ function MemorySectionComponent(): React.ReactElement {
 
   if (!isAvailable) {
     return (
-      <div className="bg-slate-800/30 rounded-lg p-6 border border-slate-700/50">
-        <h2 className="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+      <div className="bg-slate-800/30 rounded-lg p-4 sm:p-6 border border-slate-700/50">
+        <h2 className="text-base sm:text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
           <MemoryIcon /> Memory
         </h2>
         <p className="text-slate-400 text-sm">
@@ -88,8 +88,8 @@ function MemorySectionComponent(): React.ReactElement {
 
   if (error) {
     return (
-      <div className="bg-slate-800/30 rounded-lg p-6 border border-red-700/50">
-        <h2 className="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+      <div className="bg-slate-800/30 rounded-lg p-4 sm:p-6 border border-red-700/50">
+        <h2 className="text-base sm:text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
           <MemoryIcon /> Memory
         </h2>
         <p className="text-red-400 text-sm">Error: {error}</p>
@@ -103,8 +103,8 @@ function MemorySectionComponent(): React.ReactElement {
   ] : []
 
   return (
-    <div className="bg-slate-800/30 rounded-lg p-6 border border-slate-700/50">
-      <h2 className="text-lg font-semibold text-slate-200 mb-4 flex items-center gap-2">
+    <div className="bg-slate-800/30 rounded-lg p-4 sm:p-6 border border-slate-700/50 h-full">
+      <h2 className="text-base sm:text-lg font-semibold text-slate-200 mb-3 sm:mb-4 flex items-center gap-2">
         <MemoryIcon /> Memory
       </h2>
 
@@ -114,8 +114,8 @@ function MemorySectionComponent(): React.ReactElement {
           <div className="h-48 bg-slate-700/50 rounded"></div>
         </div>
       ) : (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="space-y-4 sm:space-y-5">
+          <div className="grid grid-cols-2 gap-2 sm:gap-3">
             <StatCard
               label="Total"
               value={memory ? formatBytes(memory.total, 1) : '-'}
@@ -137,13 +137,13 @@ function MemorySectionComponent(): React.ReactElement {
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
             <div>
-              <h3 className="text-sm font-medium text-slate-400 mb-2">Allocation</h3>
-              <PieChart data={pieData} height={200} innerRadius={50} outerRadius={70} />
+              <h3 className="text-xs sm:text-sm font-medium text-slate-400 mb-2">Allocation</h3>
+              <PieChart data={pieData} height={180} innerRadius={45} outerRadius={65} />
             </div>
             <div>
-              <h3 className="text-sm font-medium text-slate-400 mb-2">Usage Over Time</h3>
+              <h3 className="text-xs sm:text-sm font-medium text-slate-400 mb-2">Usage Over Time</h3>
               <LineGraph
                 data={history}
                 lines={memoryLineConfig}
