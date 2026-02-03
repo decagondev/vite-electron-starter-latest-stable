@@ -7,7 +7,38 @@
  * All exposed methods should be type-safe and validated
  */
 
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
+
+/**
+ * Memory stats interface
+ */
+interface IMemoryStats {
+  total: number;
+  used: number;
+  free: number;
+  usedPercent: number;
+}
+
+/**
+ * Network stats interface
+ */
+interface INetworkStats {
+  rxBytes: number;
+  txBytes: number;
+  rxSec: number;
+  txSec: number;
+}
+
+/**
+ * System info interface
+ */
+interface ISystemInfo {
+  cpuModel: string;
+  cpuCores: number;
+  osName: string;
+  osVersion: string;
+  hostname: string;
+}
 
 /**
  * Electron API interface
@@ -22,6 +53,9 @@ interface ElectronAPI {
     electron: string;
   };
   isPackaged: boolean;
+  getMemoryStats: () => Promise<IMemoryStats | null>;
+  getNetworkStats: () => Promise<INetworkStats | null>;
+  getSystemInfo: () => Promise<ISystemInfo | null>;
 }
 
 /**
@@ -35,6 +69,9 @@ const electronAPI: ElectronAPI = {
     electron: process.versions.electron,
   },
   isPackaged: !process.env.NODE_ENV?.includes('development'),
+  getMemoryStats: () => ipcRenderer.invoke('get-memory-stats'),
+  getNetworkStats: () => ipcRenderer.invoke('get-network-stats'),
+  getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
 }
 
 /**
