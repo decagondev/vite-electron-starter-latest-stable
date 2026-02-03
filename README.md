@@ -103,32 +103,31 @@ npm run build:desktop
 
 Deca Dash follows SOLID principles and a feature-based modular architecture:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Electron Main Process                    │
-│  ┌─────────────┐  ┌──────────────┐  ┌────────────────────┐  │
-│  │ IPC Handlers│  │ System Info  │  │ Window Management  │  │
-│  │ (stats API) │  │ (si library) │  │ (kiosk, security)  │  │
-│  └──────┬──────┘  └──────┬───────┘  └────────────────────┘  │
-└─────────┼────────────────┼──────────────────────────────────┘
-          │                │
-          ▼                ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      Preload Script                          │
-│              (contextBridge - secure API exposure)           │
-└─────────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    Renderer Process                          │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │                  React Application                   │    │
-│  │  ┌───────────┐  ┌───────────┐  ┌───────────────┐   │    │
-│  │  │ Dashboard │  │  Contexts │  │    Hooks      │   │    │
-│  │  │ Components│◄─┤  (State)  │◄─┤ (Data Fetch)  │   │    │
-│  │  └───────────┘  └───────────┘  └───────────────┘   │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph MainProcess["Electron Main Process"]
+        IPC["IPC Handlers<br/>(stats API)"]
+        SI["System Info<br/>(si library)"]
+        WM["Window Management<br/>(kiosk, security)"]
+    end
+
+    subgraph Preload["Preload Script"]
+        CB["contextBridge<br/>secure API exposure"]
+    end
+
+    subgraph Renderer["Renderer Process"]
+        subgraph React["React Application"]
+            Hooks["Hooks<br/>(Data Fetch)"]
+            Contexts["Contexts<br/>(State)"]
+            Components["Dashboard<br/>Components"]
+        end
+    end
+
+    IPC --> CB
+    SI --> CB
+    CB --> Hooks
+    Hooks --> Contexts
+    Contexts --> Components
 ```
 
 ## Security

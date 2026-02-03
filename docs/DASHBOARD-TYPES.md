@@ -21,25 +21,25 @@ Build dashboards that fetch data from REST APIs (internal or external services).
 
 ### Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Electron Main Process                    │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │                   IPC Handlers                       │    │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌────────────┐  │    │
-│  │  │ HTTP Client │  │ Auth Manager│  │ Rate Limiter│ │    │
-│  │  │  (axios)    │  │  (tokens)   │  │            │  │    │
-│  │  └──────┬──────┘  └──────┬──────┘  └─────┬──────┘  │    │
-│  │         └────────────────┴───────────────┘         │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼ REST API calls
-                    ┌─────────────────────┐
-                    │   External APIs     │
-                    │  (GitHub, Jira,     │
-                    │   custom services)  │
-                    └─────────────────────┘
+```mermaid
+flowchart TB
+    subgraph MainProcess["Electron Main Process"]
+        subgraph IPCHandlers["IPC Handlers"]
+            HTTP["HTTP Client<br/>(axios)"]
+            Auth["Auth Manager<br/>(tokens)"]
+            Rate["Rate Limiter"]
+        end
+    end
+
+    subgraph External["External APIs"]
+        GitHub["GitHub"]
+        Jira["Jira"]
+        Custom["Custom Services"]
+    end
+
+    HTTP --> External
+    Auth --> HTTP
+    Rate --> HTTP
 ```
 
 ### Implementation
@@ -228,24 +228,23 @@ Build dashboards that communicate with system services via D-Bus on Linux.
 
 ### Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     Electron Main Process                    │
-│  ┌─────────────────────────────────────────────────────┐    │
-│  │                   D-Bus Client                       │    │
-│  │  ┌─────────────┐  ┌─────────────┐  ┌────────────┐  │    │
-│  │  │ System Bus  │  │ Session Bus │  │  Signals   │  │    │
-│  │  │ (systemd)   │  │  (user)     │  │ (events)   │  │    │
-│  │  └─────────────┘  └─────────────┘  └────────────┘  │    │
-│  └─────────────────────────────────────────────────────┘    │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼ D-Bus IPC
-                    ┌─────────────────────┐
-                    │   System Services   │
-                    │  (NetworkManager,   │
-                    │   systemd, upower)  │
-                    └─────────────────────┘
+```mermaid
+flowchart TB
+    subgraph MainProcess["Electron Main Process"]
+        subgraph DBusClient["D-Bus Client"]
+            SysBus["System Bus<br/>(systemd)"]
+            SesBus["Session Bus<br/>(user)"]
+            Signals["Signals<br/>(events)"]
+        end
+    end
+
+    subgraph Services["System Services"]
+        NM["NetworkManager"]
+        SD["systemd"]
+        UP["upower"]
+    end
+
+    DBusClient -->|"D-Bus IPC"| Services
 ```
 
 ### Implementation

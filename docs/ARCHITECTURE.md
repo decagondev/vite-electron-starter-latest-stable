@@ -8,65 +8,52 @@ Deca Dash follows a feature-based modular architecture with SOLID principles, en
 
 ## System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                              ELECTRON APP                                │
-│                                                                          │
-│  ┌────────────────────────────────────────────────────────────────────┐ │
-│  │                        MAIN PROCESS                                 │ │
-│  │                                                                     │ │
-│  │  ┌──────────────┐  ┌──────────────┐  ┌─────────────────────────┐  │ │
-│  │  │   Window     │  │   Security   │  │     IPC Handlers        │  │ │
-│  │  │  Management  │  │   (CSP,      │  │  ┌─────────────────┐    │  │ │
-│  │  │              │  │   sandbox)   │  │  │ get-memory-stats│    │  │ │
-│  │  └──────────────┘  └──────────────┘  │  │ get-network-stats    │  │ │
-│  │                                       │  │ get-top-processes    │  │ │
-│  │                                       │  │ get-system-info │    │  │ │
-│  │                                       │  │ toggle-kiosk-mode    │  │ │
-│  │                                       │  └─────────────────┘    │  │ │
-│  │                                       └─────────────────────────┘  │ │
-│  │                                              │                      │ │
-│  │                                              │ systeminformation    │ │
-│  │                                              ▼                      │ │
-│  │                                       ┌──────────────┐             │ │
-│  │                                       │   OS APIs    │             │ │
-│  │                                       │ (CPU, Memory,│             │ │
-│  │                                       │  Network)    │             │ │
-│  │                                       └──────────────┘             │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
-│                                    │                                     │
-│                                    │ contextBridge (IPC)                 │
-│                                    ▼                                     │
-│  ┌────────────────────────────────────────────────────────────────────┐ │
-│  │                       PRELOAD SCRIPT                                │ │
-│  │           (Secure API exposure via contextBridge)                   │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
-│                                    │                                     │
-│                                    │ window.electronAPI                  │
-│                                    ▼                                     │
-│  ┌────────────────────────────────────────────────────────────────────┐ │
-│  │                       RENDERER PROCESS                              │ │
-│  │                                                                     │ │
-│  │  ┌──────────────────────────────────────────────────────────────┐  │ │
-│  │  │                    REACT APPLICATION                          │  │ │
-│  │  │                                                               │  │ │
-│  │  │  ┌─────────────┐    ┌─────────────┐    ┌─────────────────┐   │  │ │
-│  │  │  │  Providers  │    │   Hooks     │    │   Components    │   │  │ │
-│  │  │  │ (Contexts)  │───▶│(Data Fetch) │───▶│  (UI Display)   │   │  │ │
-│  │  │  └─────────────┘    └─────────────┘    └─────────────────┘   │  │ │
-│  │  │                                                               │  │ │
-│  │  │  ┌─────────────────────────────────────────────────────────┐ │  │ │
-│  │  │  │                    Dashboard Feature                     │ │  │ │
-│  │  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │ │  │ │
-│  │  │  │  │MemorySection│  │NetworkSection│ │ProcessesSection │  │ │  │ │
-│  │  │  │  └─────────────┘  └─────────────┘  └─────────────────┘  │ │  │ │
-│  │  │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐  │ │  │ │
-│  │  │  │  │  LineGraph  │  │  PieChart   │  │    StatCard     │  │ │  │ │
-│  │  │  │  └─────────────┘  └─────────────┘  └─────────────────┘  │ │  │ │
-│  │  │  └─────────────────────────────────────────────────────────┘ │  │ │
-│  │  └──────────────────────────────────────────────────────────────┘  │ │
-│  └────────────────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph ElectronApp["ELECTRON APP"]
+        subgraph MainProcess["MAIN PROCESS"]
+            WM["Window<br/>Management"]
+            Security["Security<br/>(CSP, sandbox)"]
+            subgraph IPCHandlers["IPC Handlers"]
+                H1["get-memory-stats"]
+                H2["get-network-stats"]
+                H3["get-top-processes"]
+                H4["get-system-info"]
+                H5["toggle-kiosk-mode"]
+            end
+            SI["systeminformation"]
+            OS["OS APIs<br/>(CPU, Memory, Network)"]
+        end
+
+        subgraph PreloadScript["PRELOAD SCRIPT"]
+            CB["contextBridge<br/>Secure API exposure"]
+        end
+
+        subgraph RendererProcess["RENDERER PROCESS"]
+            subgraph ReactApp["REACT APPLICATION"]
+                Providers["Providers<br/>(Contexts)"]
+                Hooks["Hooks<br/>(Data Fetch)"]
+                Components["Components<br/>(UI Display)"]
+                
+                subgraph Dashboard["Dashboard Feature"]
+                    MemSec["MemorySection"]
+                    NetSec["NetworkSection"]
+                    ProcSec["ProcessesSection"]
+                    LineGraph["LineGraph"]
+                    PieChart["PieChart"]
+                    StatCard["StatCard"]
+                end
+            end
+        end
+    end
+
+    IPCHandlers --> SI
+    SI --> OS
+    IPCHandlers --> CB
+    CB -->|"window.electronAPI"| Hooks
+    Providers --> Hooks
+    Hooks --> Components
+    Components --> Dashboard
 ```
 
 ## Project Structure
@@ -187,57 +174,54 @@ function MemorySection() {
 
 ## Data Flow
 
-```
-┌─────────────────────────────────────────────────────────────────────────┐
-│                              App.tsx                                     │
-│  ┌───────────────────────────────────────────────────────────────────┐  │
-│  │                        ElectronProvider                            │  │
-│  │  ┌─────────────────────────────────────────────────────────────┐  │  │
-│  │  │                       StatsProvider                          │  │  │
-│  │  │                                                              │  │  │
-│  │  │  ┌────────────────────────────────────────────────────────┐ │  │  │
-│  │  │  │                   useSystemStats                        │ │  │  │
-│  │  │  │                                                         │ │  │  │
-│  │  │  │   ┌──────────┐   ┌──────────┐   ┌──────────────────┐   │ │  │  │
-│  │  │  │   │  State   │   │ Actions  │   │ Polling Logic    │   │ │  │  │
-│  │  │  │   │ (memory, │   │(refresh, │   │ (interval-based  │   │ │  │  │
-│  │  │  │   │ network, │   │ clear)   │   │  IPC calls)      │   │ │  │  │
-│  │  │  │   │processes)│   └────┬─────┘   └─────────┬────────┘   │ │  │  │
-│  │  │  │   └────┬─────┘        │                   │            │ │  │  │
-│  │  │  └────────┼──────────────┼───────────────────┼────────────┘ │  │  │
-│  │  │           │              │                   │              │  │  │
-│  │  │           ▼              ▼                   ▼              │  │  │
-│  │  │  ┌────────────────────────────────────────────────────────┐ │  │  │
-│  │  │  │                  DashboardLayout                        │ │  │  │
-│  │  │  │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────┐   │ │  │  │
-│  │  │  │  │MemorySection│ │NetworkSection│ │ProcessesSection │   │ │  │  │
-│  │  │  │  │  ┌───────┐  │ │  ┌───────┐  │ │  ┌───────────┐  │   │ │  │  │
-│  │  │  │  │  │Charts │  │ │  │Charts │  │ │  │ProcessTable│  │   │ │  │  │
-│  │  │  │  │  │Cards  │  │ │  │Cards  │  │ │  └───────────┘  │   │ │  │  │
-│  │  │  │  │  └───────┘  │ │  └───────┘  │ │                 │   │ │  │  │
-│  │  │  │  └─────────────┘ └─────────────┘ └─────────────────┘   │ │  │  │
-│  │  │  └────────────────────────────────────────────────────────┘ │  │  │
-│  │  └─────────────────────────────────────────────────────────────┘  │  │
-│  └───────────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph App["App.tsx"]
+        subgraph EP["ElectronProvider"]
+            subgraph SP["StatsProvider"]
+                subgraph USS["useSystemStats"]
+                    State["State<br/>(memory, network, processes)"]
+                    Actions["Actions<br/>(refresh, clear)"]
+                    Polling["Polling Logic<br/>(interval-based IPC calls)"]
+                end
+                
+                subgraph DL["DashboardLayout"]
+                    subgraph MS["MemorySection"]
+                        MC["Charts & Cards"]
+                    end
+                    subgraph NS["NetworkSection"]
+                        NC["Charts & Cards"]
+                    end
+                    subgraph PS["ProcessesSection"]
+                        PT["ProcessTable"]
+                    end
+                end
+            end
+        end
+    end
+
+    Polling --> State
+    Actions --> State
+    State --> DL
+    State --> MS
+    State --> NS
+    State --> PS
 ```
 
 ## IPC Communication
 
 The main process and renderer communicate via IPC (Inter-Process Communication):
 
-```
-Renderer                    Main Process
-   │                             │
-   │  ipcRenderer.invoke()       │
-   │ ────────────────────────▶   │
-   │   'get-memory-stats'        │
-   │                             │  systeminformation.mem()
-   │                             │ ──────────────────────▶ OS
-   │                             │ ◀──────────────────────
-   │   Promise<IMemoryStats>     │
-   │ ◀────────────────────────   │
-   │                             │
+```mermaid
+sequenceDiagram
+    participant R as Renderer
+    participant M as Main Process
+    participant OS as Operating System
+
+    R->>M: ipcRenderer.invoke('get-memory-stats')
+    M->>OS: systeminformation.mem()
+    OS-->>M: Memory data
+    M-->>R: Promise<IMemoryStats>
 ```
 
 ### Security Model
