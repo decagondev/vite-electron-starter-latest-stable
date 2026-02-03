@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useBreathingTimer } from '../useBreathingTimer';
-import { PATTERN_478, PATTERN_BOX } from '../../constants/breathing.constants';
+import { PATTERN_BOX } from '../../constants/breathing.constants';
 
 describe('useBreathingTimer', () => {
   beforeEach(() => {
