@@ -97,12 +97,12 @@ function DashboardHeader(): React.ReactElement {
  */
 function DashboardLayoutComponent(): React.ReactElement {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 sm:p-6 lg:p-8">
+      <div className="w-full">
         <DashboardHeader />
         
         <main className="space-y-4 sm:space-y-6">
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 xl:grid-cols-2">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
             <MemorySection />
             <NetworkSection />
           </div>

@@ -54,10 +54,8 @@ function createWindow(): void {
     show: false,
   })
 
-  // Remove menu bar entirely on Windows/Linux
-  if (process.platform !== 'darwin') {
-    Menu.setApplicationMenu(null)
-  }
+  // Set empty menu on window for Windows/Linux
+  mainWindow.setMenu(null)
 
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
@@ -196,11 +194,21 @@ ipcMain.handle('get-system-info', async () => {
  */
 ipcMain.handle('get-top-processes', async (_event, count: number = 10) => {
   try {
-    const processes = await si.processes()
-    const mem = await si.mem()
+    const [processes, mem] = await Promise.all([
+      si.processes(),
+      si.mem(),
+    ])
     
-    const sortedByCpu = [...processes.list]
-      .sort((a, b) => b.cpu - a.cpu)
+    if (!processes.list || processes.list.length === 0) {
+      return []
+    }
+    
+    const topProcesses = [...processes.list]
+      .sort((a, b) => {
+        const cpuDiff = b.cpu - a.cpu
+        if (cpuDiff !== 0) return cpuDiff
+        return (b.memRss || 0) - (a.memRss || 0)
+      })
       .slice(0, count)
       .map(proc => ({
         pid: proc.pid,
@@ -212,7 +220,7 @@ ipcMain.handle('get-top-processes', async (_event, count: number = 10) => {
           : 0,
       }))
     
-    return sortedByCpu
+    return topProcesses
   } catch (error) {
     console.error('Error getting top processes:', error)
     return null
@@ -223,6 +231,11 @@ ipcMain.handle('get-top-processes', async (_event, count: number = 10) => {
  * Application initialization
  */
 app.whenReady().then(() => {
+  // Remove menu bar globally before creating any windows
+  if (process.platform !== 'darwin') {
+    Menu.setApplicationMenu(null)
+  }
+  
   setupSecurityHeaders()
   createWindow()
 
