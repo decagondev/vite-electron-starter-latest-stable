@@ -53,6 +53,22 @@ export interface ISystemInfo {
   hostname: string;
 }
 
+/**
+ * Process information for top processes widget
+ */
+export interface IProcessInfo {
+  /** Process ID */
+  pid: number;
+  /** Process name */
+  name: string;
+  /** CPU usage percentage */
+  cpu: number;
+  /** Memory usage in bytes */
+  memory: number;
+  /** Memory usage percentage */
+  memoryPercent: number;
+}
+
 export interface ElectronAPI {
   /** Current platform (win32, darwin, linux) */
   platform: string;
@@ -66,6 +82,8 @@ export interface ElectronAPI {
   getNetworkStats: () => Promise<INetworkStats | null>;
   /** Get system information */
   getSystemInfo: () => Promise<ISystemInfo | null>;
+  /** Get top processes by resource usage */
+  getTopProcesses: (count?: number) => Promise<IProcessInfo[] | null>;
 }
 
 declare global {

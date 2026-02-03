@@ -3,7 +3,7 @@
  * Allows testing Electron-dependent code without Electron runtime
  */
 
-import type { ElectronAPI, IMemoryStats, INetworkStats, ISystemInfo } from '@shared/types/electron.d';
+import type { ElectronAPI, IMemoryStats, INetworkStats, ISystemInfo, IProcessInfo } from '@shared/types/electron.d';
 
 /**
  * Mock memory stats for testing
@@ -37,6 +37,17 @@ export const mockSystemInfo: ISystemInfo = {
 };
 
 /**
+ * Mock processes for testing
+ */
+export const mockProcesses: IProcessInfo[] = [
+  { pid: 1234, name: 'chrome.exe', cpu: 15.5, memory: 512 * 1024 * 1024, memoryPercent: 3.2 },
+  { pid: 5678, name: 'node.exe', cpu: 8.2, memory: 256 * 1024 * 1024, memoryPercent: 1.6 },
+  { pid: 9012, name: 'code.exe', cpu: 5.1, memory: 384 * 1024 * 1024, memoryPercent: 2.4 },
+  { pid: 3456, name: 'explorer.exe', cpu: 2.3, memory: 128 * 1024 * 1024, memoryPercent: 0.8 },
+  { pid: 7890, name: 'slack.exe', cpu: 1.5, memory: 192 * 1024 * 1024, memoryPercent: 1.2 },
+];
+
+/**
  * Mock Electron API object
  */
 export const mockElectronAPI: ElectronAPI = {
@@ -50,6 +61,7 @@ export const mockElectronAPI: ElectronAPI = {
   getMemoryStats: async () => mockMemoryStats,
   getNetworkStats: async () => mockNetworkStats,
   getSystemInfo: async () => mockSystemInfo,
+  getTopProcesses: async () => mockProcesses,
 };
 
 /**
@@ -71,6 +83,7 @@ export function setupElectronMock(platform: string = 'win32', statsEnabled: bool
     getMemoryStats: statsEnabled ? async () => mockMemoryStats : async () => null,
     getNetworkStats: statsEnabled ? async () => mockNetworkStats : async () => null,
     getSystemInfo: statsEnabled ? async () => mockSystemInfo : async () => null,
+    getTopProcesses: statsEnabled ? async () => mockProcesses : async () => null,
   };
   
   Object.defineProperty(window, 'electronAPI', {
@@ -118,6 +131,20 @@ export function createMockMemoryStats(overrides: Partial<IMemoryStats> = {}): IM
 export function createMockNetworkStats(overrides: Partial<INetworkStats> = {}): INetworkStats {
   return {
     ...mockNetworkStats,
+    ...overrides,
+  };
+}
+
+/**
+ * Create mock process info with custom values
+ */
+export function createMockProcessInfo(overrides: Partial<IProcessInfo> = {}): IProcessInfo {
+  return {
+    pid: 1234,
+    name: 'test-process.exe',
+    cpu: 5.0,
+    memory: 256 * 1024 * 1024,
+    memoryPercent: 1.6,
     ...overrides,
   };
 }

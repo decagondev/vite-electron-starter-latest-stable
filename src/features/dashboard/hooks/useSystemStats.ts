@@ -12,7 +12,7 @@ import type {
   IStatsHistoryPoint,
 } from '../types/dashboard.types'
 import { STATS_DEFAULTS } from '../types/dashboard.types'
-import type { IMemoryStats, INetworkStats, ISystemInfo } from '@shared/types/electron.d'
+import type { IMemoryStats, INetworkStats, ISystemInfo, IProcessInfo } from '@shared/types/electron.d'
 
 /**
  * Check if Electron API is available
@@ -32,6 +32,7 @@ function createInitialState(): IStatsState {
     memory: null,
     network: null,
     systemInfo: null,
+    processes: null,
     history: [],
     isLoading: true,
     error: null,
@@ -116,6 +117,19 @@ export function useSystemStats(options: IUseSystemStatsOptions = {}): UseSystemS
   }, [isAvailable])
 
   /**
+   * Fetch top processes
+   */
+  const fetchTopProcesses = useCallback(async (count: number = 10): Promise<IProcessInfo[] | null> => {
+    if (!isAvailable || !window.electronAPI) return null
+    try {
+      return await window.electronAPI.getTopProcesses(count)
+    } catch (error) {
+      console.error('Error fetching top processes:', error)
+      return null
+    }
+  }, [isAvailable])
+
+  /**
    * Refresh all stats
    */
   const refreshStats = useCallback(async (): Promise<void> => {
@@ -132,9 +146,10 @@ export function useSystemStats(options: IUseSystemStatsOptions = {}): UseSystemS
     isRunningRef.current = true
 
     try {
-      const [memory, network] = await Promise.all([
+      const [memory, network, processes] = await Promise.all([
         fetchMemoryStats(),
         fetchNetworkStats(),
+        fetchTopProcesses(10),
       ])
 
       const timestamp = Date.now()
@@ -154,6 +169,7 @@ export function useSystemStats(options: IUseSystemStatsOptions = {}): UseSystemS
           ...prev,
           memory,
           network,
+          processes,
           history: newHistory,
           isLoading: false,
           error: null,
@@ -169,7 +185,7 @@ export function useSystemStats(options: IUseSystemStatsOptions = {}): UseSystemS
     } finally {
       isRunningRef.current = false
     }
-  }, [isAvailable, fetchMemoryStats, fetchNetworkStats, maxHistoryLength])
+  }, [isAvailable, fetchMemoryStats, fetchNetworkStats, fetchTopProcesses, maxHistoryLength])
 
   /**
    * Clear history data

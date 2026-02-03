@@ -41,6 +41,17 @@ interface ISystemInfo {
 }
 
 /**
+ * Process info interface
+ */
+interface IProcessInfo {
+  pid: number;
+  name: string;
+  cpu: number;
+  memory: number;
+  memoryPercent: number;
+}
+
+/**
  * Electron API interface
  * Define all methods exposed to the renderer process
  * This should match the ElectronAPI type in src/shared/types/electron.d.ts
@@ -56,6 +67,7 @@ interface ElectronAPI {
   getMemoryStats: () => Promise<IMemoryStats | null>;
   getNetworkStats: () => Promise<INetworkStats | null>;
   getSystemInfo: () => Promise<ISystemInfo | null>;
+  getTopProcesses: (count?: number) => Promise<IProcessInfo[] | null>;
 }
 
 /**
@@ -72,6 +84,7 @@ const electronAPI: ElectronAPI = {
   getMemoryStats: () => ipcRenderer.invoke('get-memory-stats'),
   getNetworkStats: () => ipcRenderer.invoke('get-network-stats'),
   getSystemInfo: () => ipcRenderer.invoke('get-system-info'),
+  getTopProcesses: (count?: number) => ipcRenderer.invoke('get-top-processes', count),
 }
 
 /**

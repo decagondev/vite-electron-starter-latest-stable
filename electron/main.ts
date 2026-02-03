@@ -189,6 +189,37 @@ ipcMain.handle('get-system-info', async () => {
 })
 
 /**
+ * Get top processes by resource usage
+ * @param _event - IPC event
+ * @param count - Number of processes to return (default: 10)
+ * @returns Array of top processes sorted by CPU and memory usage
+ */
+ipcMain.handle('get-top-processes', async (_event, count: number = 10) => {
+  try {
+    const processes = await si.processes()
+    const mem = await si.mem()
+    
+    const sortedByCpu = [...processes.list]
+      .sort((a, b) => b.cpu - a.cpu)
+      .slice(0, count)
+      .map(proc => ({
+        pid: proc.pid,
+        name: proc.name,
+        cpu: Math.round(proc.cpu * 100) / 100,
+        memory: proc.memRss || 0,
+        memoryPercent: mem.total > 0 
+          ? Math.round(((proc.memRss || 0) / mem.total) * 10000) / 100 
+          : 0,
+      }))
+    
+    return sortedByCpu
+  } catch (error) {
+    console.error('Error getting top processes:', error)
+    return null
+  }
+})
+
+/**
  * Application initialization
  */
 app.whenReady().then(() => {

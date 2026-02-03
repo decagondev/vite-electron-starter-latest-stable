@@ -6,6 +6,7 @@
 export { DashboardLayout } from './components/DashboardLayout'
 export { MemorySection } from './components/MemorySection'
 export { NetworkSection } from './components/NetworkSection'
+export { ProcessesSection } from './components/ProcessesSection'
 export { LineGraph } from './components/LineGraph'
 export { PieChart } from './components/PieChart'
 export { StatCard } from './components/StatCard'
@@ -19,6 +20,7 @@ export type {
   IMemoryStats,
   INetworkStats,
   ISystemInfo,
+  IProcessInfo,
   IStatsHistoryPoint,
   IStatsState,
   IStatsContext,

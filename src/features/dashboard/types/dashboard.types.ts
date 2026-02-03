@@ -3,12 +3,12 @@
  * Defines interfaces for system stats, history, and chart configurations
  */
 
-import type { IMemoryStats, INetworkStats, ISystemInfo } from '@shared/types/electron.d'
+import type { IMemoryStats, INetworkStats, ISystemInfo, IProcessInfo } from '@shared/types/electron.d'
 
 /**
  * Re-export stats types from electron API for convenience
  */
-export type { IMemoryStats, INetworkStats, ISystemInfo }
+export type { IMemoryStats, INetworkStats, ISystemInfo, IProcessInfo }
 
 /**
  * A single point in the stats history timeline
@@ -109,6 +109,8 @@ export interface IStatsState {
   network: INetworkStats | null;
   /** System information (loaded once) */
   systemInfo: ISystemInfo | null;
+  /** Top processes by resource usage */
+  processes: IProcessInfo[] | null;
   /** History of stats for charts */
   history: IStatsHistoryPoint[];
   /** Whether stats are currently being fetched */

@@ -8,6 +8,7 @@ import { memo } from 'react'
 import { useStats } from '../context/StatsContext'
 import { MemorySection } from './MemorySection'
 import { NetworkSection } from './NetworkSection'
+import { ProcessesSection } from './ProcessesSection'
 
 /**
  * Dashboard icon SVG component
@@ -100,9 +101,12 @@ function DashboardLayoutComponent(): React.ReactElement {
       <div className="max-w-7xl mx-auto">
         <DashboardHeader />
         
-        <main className="grid gap-4 sm:gap-6 grid-cols-1 xl:grid-cols-2">
-          <MemorySection />
-          <NetworkSection />
+        <main className="space-y-4 sm:space-y-6">
+          <div className="grid gap-4 sm:gap-6 grid-cols-1 xl:grid-cols-2">
+            <MemorySection />
+            <NetworkSection />
+          </div>
+          <ProcessesSection />
         </main>
 
         <footer className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-slate-500">
