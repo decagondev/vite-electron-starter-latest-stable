@@ -28,11 +28,14 @@ export default defineConfig(({ mode }) => {
       target: 'esnext',
       minify: isProduction ? 'esbuild' : false,
       sourcemap: isProduction ? false : true,
+      chunkSizeWarningLimit: 600,
       rollupOptions: {
         output: {
           format: 'es',
           manualChunks: isDesktop ? undefined : {
             vendor: ['react', 'react-dom'],
+            charts: ['recharts'],
+            d3: ['d3-shape', 'd3-scale', 'd3-path', 'd3-interpolate', 'd3-color', 'd3-array', 'd3-format', 'd3-time', 'd3-time-format'],
           },
         },
       },
