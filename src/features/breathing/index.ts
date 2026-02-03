@@ -9,6 +9,13 @@ export { ProgressInfo } from './components/ProgressInfo';
 export { useBreathingTimer } from './hooks/useBreathingTimer';
 export type { UseBreathingTimerOptions } from './hooks/useBreathingTimer';
 
+export { 
+  BreathingProvider, 
+  useBreathing,
+  BreathingContext,
+} from './context/BreathingContext';
+export type { BreathingProviderProps } from './context/BreathingContext';
+
 export {
   PATTERN_478,
   PATTERN_BOX,
