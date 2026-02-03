@@ -1,13 +1,15 @@
-# Vite-React-TypeScript-Electron Template
+# System Dashboard - Electron Application
 
-A modern, extensible template for building cross-platform desktop applications with React 19, Vite 7, TypeScript, and Electron 40. Includes a demo 4-7-8 breathing exercise app.
+A real-time system monitoring dashboard built with React 19, Vite 7, TypeScript, and Electron 40. Displays memory and network statistics with interactive charts.
 
 ## Features
 
+- **Real-time Monitoring**: Memory and network stats updated every 2 seconds
+- **Interactive Charts**: Line graphs and pie charts powered by Recharts
 - **Modern Stack**: React 19.2.4, Vite 7.3.1, Electron 40.1.0, TypeScript 5.7
 - **SOLID Architecture**: Feature-based modular design with dependency injection
 - **Tailwind CSS v4**: Modern utility-first styling with Vite plugin
-- **Comprehensive Testing**: Vitest with React Testing Library (80%+ coverage)
+- **Comprehensive Testing**: Vitest with React Testing Library (139+ tests)
 - **CI/CD Ready**: GitHub Actions workflow included
 - **Electron Security**: Sandbox, CSP, context isolation enabled
 
@@ -51,21 +53,21 @@ npm run build:desktop
 
 ```
 ├── electron/                 # Electron main process
-│   ├── main.ts              # App lifecycle, security config
-│   └── preload.ts           # Secure API bridge
+│   ├── main.ts              # App lifecycle, security config, IPC handlers
+│   └── preload.ts           # Secure API bridge (stats API)
 ├── src/
 │   ├── features/            # Feature modules
-│   │   └── breathing/       # Demo breathing exercise
-│   │       ├── components/  # UI components
-│   │       ├── hooks/       # Custom React hooks
-│   │       ├── context/     # Context providers
-│   │       ├── constants/   # Configuration
-│   │       └── types/       # TypeScript types
+│   │   ├── dashboard/       # System stats dashboard
+│   │   │   ├── components/  # UI components (charts, cards, sections)
+│   │   │   ├── hooks/       # useSystemStats hook
+│   │   │   ├── context/     # StatsContext provider
+│   │   │   └── types/       # TypeScript interfaces
+│   │   └── breathing/       # Demo breathing exercise (deprecated)
 │   ├── shared/              # Shared utilities
 │   │   ├── context/         # App-wide contexts
 │   │   ├── lib/             # Utilities
-│   │   └── types/           # Shared types
-│   ├── test/                # Test utilities
+│   │   └── types/           # Shared types (ElectronAPI)
+│   ├── test/                # Test utilities and mocks
 │   ├── App.tsx              # Root component
 │   └── main.tsx             # Entry point
 ├── .github/workflows/       # CI configuration
@@ -75,7 +77,7 @@ npm run build:desktop
 ## Path Aliases
 
 ```typescript
-import { useBreathing } from '@features/breathing';
+import { DashboardLayout, useStats } from '@features/dashboard';
 import { isElectron } from '@shared/index';
 import { something } from '@/components/Something';
 ```
@@ -151,6 +153,8 @@ Test coverage targets: 80%+ on business logic.
 | Electron | 40.1.0 | Desktop framework |
 | TypeScript | 5.7 | Type safety |
 | Tailwind CSS | 4.1 | Styling |
+| Recharts | 2.x | Data visualization |
+| systeminformation | 5.x | System stats (Node.js) |
 | Vitest | 4.0 | Testing |
 | electron-builder | 26.7 | App packaging |
 
@@ -163,12 +167,19 @@ Test coverage targets: 80%+ on business logic.
 
 MIT License - see [LICENSE](LICENSE)
 
-## Demo App
+## System Dashboard
 
-The template includes a 4-7-8 breathing exercise demo:
+The application displays real-time system statistics:
 
-1. **Inhale** for 4 seconds
-2. **Hold** for 7 seconds  
-3. **Exhale** for 8 seconds
+### Memory Statistics
+- Total, used, and free memory
+- Memory usage percentage with trend indicators
+- Pie chart showing memory allocation
+- Line graph showing usage over time
 
-This demonstrates the architecture patterns and can be removed or replaced with your own feature.
+### Network Statistics
+- Current download/upload speeds
+- Total data transferred
+- Line graph showing network activity over time
+
+**Note**: System stats are only available when running in Electron. The web version shows a message indicating stats are unavailable.
