@@ -1,179 +1,174 @@
-# Breath Exercise - 4-7-8 Breathing App
+# Vite-React-TypeScript-Electron Template
 
-A modern breathing exercise application that guides users through the 4-7-8 breathing technique. Available as both a web application and a cross-platform desktop application built with Electron.
+A modern, extensible template for building cross-platform desktop applications with React 19, Vite 7, TypeScript, and Electron 40. Includes a demo 4-7-8 breathing exercise app.
 
 ## Features
 
-- 🫁 **4-7-8 Breathing Technique** - Guided breathing exercise (inhale 4s, hold 7s, exhale 8s)
-- ⏱️ **Customizable Sessions** - Choose from 2, 5, 10, or 15 minute sessions
-- 📊 **Progress Tracking** - View cycle count and session time remaining
-- 🎨 **Visual Feedback** - Animated breathing circle that changes with each phase
-- 💻 **Cross-Platform** - Available as web app and desktop app (macOS, Windows, Linux)
+- **Modern Stack**: React 19.2.4, Vite 7.3.1, Electron 40.1.0, TypeScript 5.7
+- **SOLID Architecture**: Feature-based modular design with dependency injection
+- **Tailwind CSS v4**: Modern utility-first styling with Vite plugin
+- **Comprehensive Testing**: Vitest with React Testing Library (80%+ coverage)
+- **CI/CD Ready**: GitHub Actions workflow included
+- **Electron Security**: Sandbox, CSP, context isolation enabled
 
-## Tech Stack
-
-- ⚡️ [Vite](https://vitejs.dev/) - Lightning fast frontend tooling
-- ⚛️ [React 19](https://react.dev/) - Latest version of React
-- 📝 [TypeScript](https://www.typescriptlang.org/) - Type safety
-- 🎨 [Tailwind CSS 4](https://tailwindcss.com/) - Utility-first CSS framework
-- 🖥️ [Electron](https://www.electronjs.org/) - Cross-platform desktop framework
-- 🧹 [ESLint](https://eslint.org/) - Modern linting rules
-
-## Prerequisites
-
-- Node.js (latest LTS version recommended)
-- npm (comes with Node.js)
-
-## Getting Started
-
-### Installation
+## Quick Start
 
 ```bash
-# Clone the repository
-git clone <repository-url>
-cd breath-electron
-
-# Install dependencies
+# Install dependencies (requires Node.js 20+)
 npm install
-```
 
-## Development
-
-### Web Development
-
-Start the development server for web:
-
-```bash
+# Start web development server
 npm run dev
-```
 
-Visit http://localhost:5173 to see your application running.
-
-### Desktop Development
-
-Run the application in Electron with hot-reload:
-
-```bash
+# Start desktop development
 npm run dev:desktop
-```
 
-This will:
-1. Start the Vite dev server
-2. Build the Electron main process
-3. Launch the Electron app with DevTools open
+# Run tests
+npm run test
 
-## Building
-
-### Web Build
-
-Build the web application for production:
-
-```bash
-npm run build
-```
-
-The built files will be in the `dist/` directory. Preview the production build:
-
-```bash
-npm run preview
-```
-
-### Desktop Build
-
-Build the desktop application for all platforms:
-
-```bash
+# Build for production
 npm run build:desktop
 ```
 
-Build for a specific platform:
+## Scripts
 
-```bash
-# macOS
-npm run build:desktop:mac
-
-# Windows
-npm run build:desktop:win
-
-# Linux
-npm run build:desktop:linux
-```
-
-Built applications will be in the `release/` directory:
-- **macOS**: `.dmg` and `.zip` files
-- **Windows**: `.exe` installer (NSIS) and `.zip` files
-- **Linux**: `.AppImage`, `.deb`, and `.rpm` packages
-
-### Desktop Build Process
-
-The desktop build process:
-1. Builds the React app with Vite in desktop mode (sets base path to `./`)
-2. Compiles the Electron main process TypeScript files
-3. Packages everything with electron-builder
-
-## Available Scripts
-
-### Development
-- `npm run dev` - Start web development server
-- `npm run dev:desktop` - Start desktop development with hot-reload
-
-### Building
-- `npm run build` - Build web application for production
-- `npm run build:desktop` - Build desktop app for all platforms
-- `npm run build:desktop:mac` - Build desktop app for macOS
-- `npm run build:desktop:win` - Build desktop app for Windows
-- `npm run build:desktop:linux` - Build desktop app for Linux
-
-### Utilities
-- `npm run lint` - Run ESLint
-- `npm run preview` - Preview the production web build locally
-- `npm run preview:desktop` - Build and preview desktop app locally
+| Script | Description |
+|--------|-------------|
+| `npm run dev` | Start Vite dev server (web) |
+| `npm run dev:desktop` | Start Electron with hot-reload |
+| `npm run build` | Build web application |
+| `npm run build:web` | Build web for production |
+| `npm run build:desktop` | Build Electron for all platforms |
+| `npm run build:desktop:win` | Build for Windows |
+| `npm run build:desktop:mac` | Build for macOS |
+| `npm run build:desktop:linux` | Build for Linux |
+| `npm run test` | Run tests in watch mode |
+| `npm run test:run` | Run tests once |
+| `npm run test:coverage` | Run tests with coverage |
+| `npm run lint` | Run ESLint |
 
 ## Project Structure
 
 ```
-breath-electron/
-├── dist/                  # Web build output
-├── electron/              # Electron main process
-│   ├── main.ts           # Main process entry point
-│   └── preload.ts        # Preload script
-├── electron-dist/         # Compiled Electron files
-├── release/              # Desktop build output
-├── src/                  # Source files
-│   ├── components/       # React components
-│   │   ├── BreathingCircle.tsx
-│   │   ├── ControlPanel.tsx
-│   │   ├── ProgressInfo.tsx
-│   │   └── QuoteGen.tsx
-│   ├── hooks/            # React hooks
-│   │   └── useBreathingTimer.ts
-│   ├── lib/              # Utilities
-│   │   └── isElectron.ts
-│   ├── types/            # TypeScript types
-│   ├── App.tsx           # Main App component
-│   ├── App.css           # App-specific styles
-│   ├── index.css         # Global styles with Tailwind
-│   └── main.tsx          # Entry point
-├── .gitignore
-├── eslint.config.js      # ESLint configuration
-├── index.html            # HTML template
-├── package.json          # Dependencies and scripts
-├── tsconfig.json         # TypeScript configuration (root)
-├── tsconfig.app.json     # TypeScript config for app
-├── tsconfig.electron.json # TypeScript config for Electron
-├── vite.config.ts        # Vite configuration
-└── README.md             # This file
+├── electron/                 # Electron main process
+│   ├── main.ts              # App lifecycle, security config
+│   └── preload.ts           # Secure API bridge
+├── src/
+│   ├── features/            # Feature modules
+│   │   └── breathing/       # Demo breathing exercise
+│   │       ├── components/  # UI components
+│   │       ├── hooks/       # Custom React hooks
+│   │       ├── context/     # Context providers
+│   │       ├── constants/   # Configuration
+│   │       └── types/       # TypeScript types
+│   ├── shared/              # Shared utilities
+│   │   ├── context/         # App-wide contexts
+│   │   ├── lib/             # Utilities
+│   │   └── types/           # Shared types
+│   ├── test/                # Test utilities
+│   ├── App.tsx              # Root component
+│   └── main.tsx             # Entry point
+├── .github/workflows/       # CI configuration
+└── docs/                    # Documentation
 ```
 
-## How It Works
+## Path Aliases
 
-The 4-7-8 breathing technique is a relaxation exercise that involves:
-1. **Inhale** for 4 seconds
-2. **Hold** your breath for 7 seconds
-3. **Exhale** for 8 seconds
+```typescript
+import { useBreathing } from '@features/breathing';
+import { isElectron } from '@shared/index';
+import { something } from '@/components/Something';
+```
 
-This cycle repeats throughout your session. The app provides visual and timing guidance to help you maintain the correct rhythm.
+## Adding a New Feature
+
+1. Create feature directory:
+   ```
+   src/features/my-feature/
+   ├── components/
+   ├── hooks/
+   ├── types/
+   └── index.ts
+   ```
+
+2. Create barrel export (`index.ts`):
+   ```typescript
+   export { MyComponent } from './components/MyComponent';
+   export { useMyHook } from './hooks/useMyHook';
+   ```
+
+3. Add tests in `__tests__/` directories
+
+4. Import in your app:
+   ```typescript
+   import { MyComponent, useMyHook } from '@features/my-feature';
+   ```
+
+## Architecture
+
+This template follows SOLID principles:
+
+- **Single Responsibility**: Each module has one purpose
+- **Open/Closed**: Extensible via configuration (e.g., custom breathing patterns)
+- **Liskov Substitution**: Patterns implement same interface
+- **Interface Segregation**: Small, focused interfaces
+- **Dependency Inversion**: Components use context, not direct dependencies
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed documentation.
+
+## Security
+
+Electron security features enabled:
+
+- `nodeIntegration: false`
+- `contextIsolation: true`
+- `sandbox: true`
+- Content Security Policy headers
+- Navigation restriction to trusted origins
+- Preload script with contextBridge
+
+## Testing
+
+```bash
+# Run all tests
+npm run test:run
+
+# Run with coverage
+npm run test:coverage
+
+# Run in watch mode
+npm run test
+```
+
+Test coverage targets: 80%+ on business logic.
+
+## Tech Stack
+
+| Technology | Version | Purpose |
+|------------|---------|---------|
+| React | 19.2.4 | UI framework |
+| Vite | 7.3.1 | Build tool |
+| Electron | 40.1.0 | Desktop framework |
+| TypeScript | 5.7 | Type safety |
+| Tailwind CSS | 4.1 | Styling |
+| Vitest | 4.0 | Testing |
+| electron-builder | 26.7 | App packaging |
+
+## Requirements
+
+- Node.js 20+
+- npm 10+
 
 ## License
 
-This project is open source and available under the [MIT License](LICENSE).
+MIT License - see [LICENSE](LICENSE)
+
+## Demo App
+
+The template includes a 4-7-8 breathing exercise demo:
+
+1. **Inhale** for 4 seconds
+2. **Hold** for 7 seconds  
+3. **Exhale** for 8 seconds
+
+This demonstrates the architecture patterns and can be removed or replaced with your own feature.
