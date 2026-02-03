@@ -18,26 +18,26 @@
     "preview:desktop": "npm run build -- --mode desktop && npm run electron:build && electron ."
   },
   "dependencies": {
-    "@tailwindcss/vite": "^4.1.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "tailwindcss": "^4.1.4"
+    "@tailwindcss/vite": "^4.1.18",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.1.18"
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@types/react": "^19.2.10",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.3",
     "concurrently": "^9.2.1",
-    "electron": "^39.2.3",
-    "electron-builder": "^26.0.12",
+    "electron": "^40.1.0",
+    "electron-builder": "^26.7.0",
     "eslint": "^9.22.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^16.0.0",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
-    "vite": "^6.3.0",
+    "vite": "^7.3.1",
     "wait-on": "^9.0.3"
   },
   "build": {
