@@ -1,7 +1,8 @@
 {
-  "name": "vite-tailwind4-starter",
+  "name": "system-dashboard",
+  "description": "Real-time system monitoring dashboard with memory and network statistics",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "type": "module",
   "main": "electron-dist/main.js",
   "scripts": {
@@ -54,8 +55,8 @@
     "wait-on": "^9.0.3"
   },
   "build": {
-    "appId": "com.breathapp.electron",
-    "productName": "Breath Exercise",
+    "appId": "com.systemdashboard.electron",
+    "productName": "System Dashboard",
     "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
     "directories": {
       "output": "release",
@@ -69,7 +70,7 @@
     "asar": true,
     "compression": "maximum",
     "mac": {
-      "category": "public.app-category.healthcare-fitness",
+      "category": "public.app-category.utilities",
       "target": [
         {
           "target": "dmg",
