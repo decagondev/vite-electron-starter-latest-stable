@@ -2,12 +2,14 @@
  * Electron main process
  * Manages application lifecycle and window creation
  * Implements security best practices for Electron 40+
+ * Provides IPC handlers for system stats (dashboard feature)
  */
 
-import { app, BrowserWindow, session } from 'electron'
+import { app, BrowserWindow, session, ipcMain } from 'electron'
 import { fileURLToPath } from 'url'
 import { dirname, join } from 'path'
 import { existsSync } from 'fs'
+import si from 'systeminformation'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
@@ -106,6 +108,78 @@ function setupSecurityHeaders(): void {
     })
   })
 }
+
+/**
+ * IPC Handlers for System Stats
+ * Provides memory and network statistics to the renderer process
+ */
+
+/**
+ * Get memory statistics
+ * @returns Memory stats object with total, used, free, and percentage
+ */
+ipcMain.handle('get-memory-stats', async () => {
+  try {
+    const mem = await si.mem()
+    return {
+      total: mem.total,
+      used: mem.used,
+      free: mem.free,
+      usedPercent: (mem.used / mem.total) * 100,
+    }
+  } catch (error) {
+    console.error('Error getting memory stats:', error)
+    return null
+  }
+})
+
+/**
+ * Get network statistics
+ * @returns Network stats object with upload/download speeds and totals
+ */
+ipcMain.handle('get-network-stats', async () => {
+  try {
+    const networkStats = await si.networkStats()
+    const defaultInterface = networkStats[0] || {
+      rx_bytes: 0,
+      tx_bytes: 0,
+      rx_sec: 0,
+      tx_sec: 0,
+    }
+    return {
+      rxBytes: defaultInterface.rx_bytes,
+      txBytes: defaultInterface.tx_bytes,
+      rxSec: defaultInterface.rx_sec ?? 0,
+      txSec: defaultInterface.tx_sec ?? 0,
+    }
+  } catch (error) {
+    console.error('Error getting network stats:', error)
+    return null
+  }
+})
+
+/**
+ * Get system information (CPU, OS, etc.)
+ * @returns Basic system information
+ */
+ipcMain.handle('get-system-info', async () => {
+  try {
+    const [cpu, osInfo] = await Promise.all([
+      si.cpu(),
+      si.osInfo(),
+    ])
+    return {
+      cpuModel: cpu.brand,
+      cpuCores: cpu.cores,
+      osName: osInfo.distro,
+      osVersion: osInfo.release,
+      hostname: osInfo.hostname,
+    }
+  } catch (error) {
+    console.error('Error getting system info:', error)
+    return null
+  }
+})
 
 /**
  * Application initialization
