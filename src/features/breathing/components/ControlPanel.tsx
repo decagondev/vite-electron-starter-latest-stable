@@ -1,10 +1,23 @@
-import { ControlPanelProps } from '../types/breathing.types';
+import type { ControlPanelProps } from '../types/breathing.types';
+import { DEFAULT_DURATION_OPTIONS } from '../constants/breathing.constants';
 
+/**
+ * ControlPanel component
+ * Provides controls for starting/stopping sessions and setting duration
+ * 
+ * @param props - Component props
+ * @param props.isActive - Whether session is active
+ * @param props.sessionDuration - Current duration setting
+ * @param props.onToggle - Toggle callback
+ * @param props.onDurationChange - Duration change callback
+ * @param props.durationOptions - Optional custom duration options (Open/Closed principle)
+ */
 export function ControlPanel({ 
   isActive, 
   sessionDuration, 
   onToggle, 
-  onDurationChange 
+  onDurationChange,
+  durationOptions = DEFAULT_DURATION_OPTIONS,
 }: ControlPanelProps) {
   return (
     <div className="mt-8 flex gap-4 items-center">
@@ -28,10 +41,11 @@ export function ControlPanel({
           disabled={isActive}
           className="bg-slate-800 border border-slate-600 rounded px-2 py-1 text-sm"
         >
-          <option value={2}>2 minutes</option>
-          <option value={5}>5 minutes</option>
-          <option value={10}>10 minutes</option>
-          <option value={15}>15 minutes</option>
+          {durationOptions.map((minutes) => (
+            <option key={minutes} value={minutes}>
+              {minutes} minute{minutes !== 1 ? 's' : ''}
+            </option>
+          ))}
         </select>
       </div>
     </div>

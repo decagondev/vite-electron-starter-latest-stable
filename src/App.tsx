@@ -5,8 +5,17 @@ import {
   ProgressInfo,
 } from '@features/breathing';
 
+/**
+ * Main application component
+ * Demonstrates the breathing exercise with SOLID-compliant architecture
+ */
 export function App() {
-  const { state, toggleSession, setSessionDuration } = useBreathingTimer();
+  const { 
+    state, 
+    toggleSession, 
+    setSessionDuration,
+    currentPhaseConfig,
+  } = useBreathingTimer();
   
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4">
@@ -15,7 +24,8 @@ export function App() {
         
         <BreathingCircle 
           phase={state.phase} 
-          timeRemaining={state.phaseTimeRemaining} 
+          timeRemaining={state.phaseTimeRemaining}
+          instruction={currentPhaseConfig?.instruction}
         />
         
         <ControlPanel 
