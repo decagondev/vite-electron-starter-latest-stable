@@ -34,7 +34,7 @@ describe('DashboardLayout', () => {
 
   it('renders dashboard title', () => {
     render(<DashboardLayoutWithProvider />)
-    expect(screen.getByText('System Dashboard')).toBeInTheDocument()
+    expect(screen.getByText('Deca Dash')).toBeInTheDocument()
   })
 
   it('renders refresh button', () => {
@@ -44,7 +44,8 @@ describe('DashboardLayout', () => {
 
   it('renders Memory section', () => {
     render(<DashboardLayoutWithProvider />)
-    expect(screen.getByText('Memory')).toBeInTheDocument()
+    const memorySectionHeading = screen.getByRole('heading', { name: /Memory/i })
+    expect(memorySectionHeading).toBeInTheDocument()
   })
 
   it('renders Network section', () => {
@@ -60,7 +61,7 @@ describe('DashboardLayout', () => {
   it('renders with proper layout styling', () => {
     const { container } = render(<DashboardLayoutWithProvider />)
     expect(container.querySelector('.min-h-screen')).toBeInTheDocument()
-    expect(container.querySelector('.max-w-7xl')).toBeInTheDocument()
+    expect(container.querySelector('.w-full')).toBeInTheDocument()
   })
 
   it('has background gradient', () => {
